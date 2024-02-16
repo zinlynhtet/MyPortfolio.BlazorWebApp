@@ -109,7 +109,7 @@
         formData.Name = "";
         formData.Email = "";
         formData.Comments = "";
-        var response = await httpClient.PostAsync(formEndpoint, formContent);
+        await httpClient.PostAsync(formEndpoint, formContent);
     }
 
     private class ContactFormData
