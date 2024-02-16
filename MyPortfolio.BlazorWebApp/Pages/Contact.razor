@@ -5,12 +5,11 @@
     <header id="header">
         <!-- navigation section  -->
         <div class="header-content clearfix">
-            <a class="logo" href="index.html"><img src="images/logo.png" alt="Mafolio"></a>
+            <a class="logo" href="/"><img src="images/logo.png" alt="Mafolio"></a>
             <nav class="navigation" role="navigation">
                 <ul class="primary-nav">
                     <li><a href="/aboutMe">About Me</a></li>
                     <li><a href="/contact">Contact</a></li>
-                    <li><a href="#">External link</a></li>
                 </ul>
             </nav>
             <a href="#" class="nav-toggle">Menu<span></span></a>
@@ -32,17 +31,29 @@
 <section id="inner-description" class="section inner-description">
     <div class="container">
         <div class="col-md-10 col-md-offset-1 text-center">
-            <p>I am honest, discreet and always focus on your goals. If you are looking for a strategist and experienced designer, just leave me a message and I'll contact you soon.</p>
-            <!--contact form start-->
+            <p>I am honest, discreet and always focus on your goals.</p>
             <div class="col-md-6 col-md-offset-3 conForm">
-                <div id="message"></div>
-                <form method="post" action="php/contact.php" name="cform" id="cform">
-                    <input name="name" id="name" type="text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" placeholder="Your name...">
-                    <input name="email" id="email" type="email" class=" col-xs-12 col-sm-12 col-md-12 col-lg-12 noMarr" placeholder="Email Address...">
-                    <textarea name="comments" id="comments" cols="" rows="" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" placeholder="Project Details..."></textarea>
-                    <input type="submit" id="submit" name="send" class="submitBnt" value="Send">
+                <EditForm Model="@formData" OnValidSubmit="@HandleValidSubmit">
+                    <DataAnnotationsValidator />
+                    <div id="message"></div>
+                    <div class="form-group">
+                        <label for="name">Your name:</label>
+                        <InputText @bind-Value="formData.Name" name="name" class="form-control" />
+                        <ValidationMessage For="@(() => formData.Name)" />
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address:</label>
+                        <InputText @bind-Value="formData.Email" name="email" class="form-control" />
+                        <ValidationMessage For="@(() => formData.Email)" />
+                    </div>
+                    <div class="form-group">
+                        <label for="comments">Project Details:</label>
+                        <InputTextArea @bind-Value="formData.Comments" name="comments" class="form-control" />
+                        <ValidationMessage For="@(() => formData.Comments)" />
+                    </div>
+                    <button type="submit" class="submitBnt">Send</button>
                     <div id="simple-msg"></div>
-                </form>
+                </EditForm>
             </div>
             <!--contact form end-->
         </div>
@@ -56,17 +67,14 @@
             <div class="col-md-12">
                 <p>
                     <ul class="footer-share">
-                        <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                        <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                        <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                        <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
-                        <li><a href="#"><i class="fa fa-pinterest-p"></i></a></li>
-                        <li><a href="#"><i class="fa fa-vimeo"></i></a></li>
+                        <li><a href="https://www.facebook.com/fli21k"><i class="fa fa-facebook"></i></a></li>
+                        <li><a href="https://www.linkedin.com/in/zin-linnhtet-5537702a3/"><i class="fa fa-linkedin"></i></a></li>
+                        <li><a href="mailto:zinlinnhtet.dev@gmail.com"><i class="fa fa-google-plus"></i></a></li>
                     </ul>
                 </p>
                 <p>
-                    © 2015 All rights reserved. All Rights Reserved<br>
-                    Made with <i class="fa fa-heart pulse"></i> by <a href="http://kamalchaneman.com/">Designstub</a>
+                    © 2024 All rights reserved. All Rights Reserved<br>
+                    Made with <i class="fa fa-heart pulse"></i> by ZinLinnhtet.
                 </p>
             </div>
         </div>
@@ -85,5 +93,35 @@
 
 
 @code {
+    private ContactFormData formData = new ContactFormData();
 
+    private async void HandleValidSubmit()
+    {
+        var formEndpoint = "https://formspree.io/f/mwkgonay";
+
+        var httpClient = new HttpClient();
+        var formContent = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                { "name", formData.Name },
+                { "email", formData.Email },
+                { "comments", formData.Comments }
+            });
+        formData.Name = "";
+        formData.Email = "";
+        formData.Comments = "";
+        var response = await httpClient.PostAsync(formEndpoint, formContent);
+    }
+
+    private class ContactFormData
+    {
+        [Required(ErrorMessage = "Please enter your name.")]
+        public string Name { get; set; }
+
+        [Required(ErrorMessage = "Please enter your email address.")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Please enter project details.")]
+        public string Comments { get; set; }
+    }
 }
