@@ -90,26 +90,30 @@
 <script src="js/modernizr.js"></script>
 <script src="js/jquery.contact.js"></script>
 <script src="js/main.js"></script>
-
-
 @code {
     private ContactFormData formData = new ContactFormData();
-
-    private async void HandleValidSubmit()
+    private async Task HandleValidSubmit()
     {
-        var formEndpoint = "https://formspree.io/f/mwkgonay";
+        try
+        {
+            var formEndpoint = "https://formspree.io/f/mwkgonay";
 
-        var httpClient = new HttpClient();
-        var formContent = new FormUrlEncodedContent(new Dictionary<string, string>
+            var httpClient = new HttpClient();
+            var formContent = new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 { "name", formData.Name },
                 { "email", formData.Email },
                 { "comments", formData.Comments }
             });
+            await httpClient.PostAsync(formEndpoint, formContent);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
         formData.Name = "";
         formData.Email = "";
         formData.Comments = "";
-        await httpClient.PostAsync(formEndpoint, formContent);
     }
 
     private class ContactFormData
